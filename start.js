@@ -57,7 +57,7 @@ function runRSS(bot) {
          var today = new Date();
          var pubdate = new Date(article.pubdate);
 
-         var message = 'New Post on the forum: "' + article.title +' click here to respond: ' + article.link;
+         var message = '{Bot] New Post on the forum: "' + article.title +' click here to respond: ' + article.link;
 
          if (today.getFullYear() == pubdate.getFullYear() &&
              today.getMonth() == pubdate.getMonth() &&
