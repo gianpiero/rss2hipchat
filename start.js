@@ -1,40 +1,77 @@
 var wobot = require('wobot');
 var prompt = require('prompt');
 
-var myjid = "<PUT YOUR ID HERE>";
-var myroom = "<PUT YOUR CHAT ID HERE>";
-var feed = '<PUT YOUR RSS FEED HERE>';
 
+
+
+var argv = require('minimist')(process.argv.slice(2));
+console.dir(argv);
+
+var myjid    = argv.id;
+var myroom   = argv.room;
+var feed     = argv.feed;
+var password = argv.password;
+
+// If you don't want to use the cmd line you can specify your values here:
+
+myjid; //"<PUT YOUR ID HERE>";
+myroom; //"<PUT YOUR CHAT ID HERE>";
+feed; //'<PUT YOUR RSS FEED HERE>';
 
 prompt.start();
 
-prompt.get([{
-      name: 'password',
-      hidden: true,
-      conform: function (value) {
-        return true;
-      }
-    }],
+
+if (myjid == undefined) {
+    console.error("You must specify your id! Either by command line (--id) or by editing the file")
+    return;
+}
+
+if (myroom == undefined) {
+    console.error("You must specify your room! Either by command line (--room) or by editing the file")
+    return;
+}
+
+if (feed == undefined) {
+    console.error("You must specify your feed! Either by command line (--feed) or by editing the file")
+    return;
+}
+
+function job(err, result) {
+  //console.log('Command-line input received:');
+  //console.log('  password: ' + result.password);
+
+  var bot = new wobot.Bot({
+    jid: myjid,
+    password: result.password
+  });
+
+  bot.connect();
+
+  bot.onConnect(function() {
+    console.log(' -=- > Connected');
+
+    this.join(myroom);
+    console.log(' -=- > Joined Room');
+    runRSS(bot);
+  });
+}
+
+if (password == undefined)  {
+    prompt.get([{
+          name: 'password',
+          hidden: true,
+          conform: function (value) {
+            return true;
+          }
+        }],
     function (err, result) {
-      //console.log('Command-line input received:');
-      //console.log('  password: ' + result.password);
-
-      var bot = new wobot.Bot({
-        jid: myjid,
-        password: result.password
-      });
-
-      bot.connect();
-
-      bot.onConnect(function() {
-        console.log(' -=- > Connected');
-
-        this.join(myroom);
-        console.log(' -=- > Joined Room');
-        runRSS(bot);
-      });
-    }
-);
+        job(err,result);
+    });
+} else {
+    var result = {};
+    result.password = password;
+    job(null,result);
+}
 
 var Watcher = require('rss-watcher');
 var watcher = new Watcher(feed);
