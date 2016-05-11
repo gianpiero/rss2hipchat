@@ -65,7 +65,7 @@ function runRSS(bot) {
                 //Is a today article
                 console.log(" -=- > Sending: ");
                 console.log(message);
-                bot.message('164033_mct@conf.hipchat.com', message);
+                bot.message(myroom, message);
             } else {
                 // Old message
                 console.log("Posted on: " + pubdate.toDateString())
